@@ -39,8 +39,8 @@ h1{font-size:30px; font-weight:700; letter-spacing:-.01em; margin:6px 0 4px}
 .field:last-child{margin-bottom:0}
 label{display:block; font-size:14px; font-weight:500; margin-bottom:6px}
 label .unit{color:var(--muted); font-weight:400; font-size:13px}
-input[type=number],select{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-family:'IBM Plex Mono',monospace; font-size:15px; background:#FCFBF8; color:var(--ink); transition:border-color .15s, box-shadow .15s}
-input[type=number]:focus,select:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(21,122,91,.12)}
+input[type=number],input[type=text],select{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-family:'IBM Plex Mono',monospace; font-size:15px; background:#FCFBF8; color:var(--ink); transition:border-color .15s, box-shadow .15s}
+input[type=number]:focus,input[type=text]:focus,select:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(21,122,91,.12)}
 select{font-family:'Sarabun',sans-serif}
 .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
 .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px}
@@ -65,6 +65,11 @@ details .body{padding-top:14px}
 .tool .body2{margin-top:12px}
 .placeholder-note{background:#FBF6EC; border:1px solid #ECE0C6; border-radius:8px; padding:8px 11px; font-size:12px; color:#7A6A45; margin-top:10px; line-height:1.5}
 
+.addbtn{margin-top:2px;background:var(--soft);border:1px solid #D4E5DC;color:var(--primary-dark);font-family:'Sarabun';font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;cursor:pointer}
+.addbtn:hover{background:#E3EFE9}
+.endow-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px}
+.endow-del{background:#F3E6E0;border:1px solid #E6CFC4;color:var(--gap);width:38px;height:42px;border-radius:10px;cursor:pointer;font-size:18px;flex-shrink:0}
+.endow-del:hover{background:#ECD7CD}
 .toggle{display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500}
 .toggle input{width:auto}
 
@@ -115,6 +120,84 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
 </header>
 
 <div class="wrap">
+<!-- TAX MODULE -->
+<div class="section-title">วางแผนภาษี (ปีภาษี 2569)</div>
+<div class="section-sub">กรอกค่าลดหย่อนของคุณ ระบบจะคำนวณภาษีเทียบกรณีไม่มี vs มีกลุ่มลงทุน/ประกันเพื่อเกษียณ (RMF · ประกันบำนาญ · ประกันชีวิต · ThaiESG/ESGX · กอช. · PVD) ว่าประหยัดภาษีได้เท่าไหร่ (ปีภาษี 2569 เกณฑ์เดิม)</div>
+
+<div class="grid" style="padding-top:0">
+  <div>
+    <div class="card">
+      <h2><span class="dot"></span>รายได้ และค่าลดหย่อน</h2>
+      <div class="field"><label>เงินได้ทั้งปี (40(1)(2)) <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="taxIncome" value="900000"></div>
+      <div class="hint" style="margin-top:-6px">หักค่าใช้จ่ายเหมา 50% สูงสุด 100,000 ให้อัตโนมัติ</div>
+      <details open>
+        <summary>ค่าลดหย่อนพื้นฐาน</summary>
+        <div class="body">
+          <div class="row2">
+            <div class="field"><label>ส่วนตัว (คงที่) <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="dPersonal" value="60000" disabled></div>
+            <div class="field"><label>คู่สมรส (ไม่มีเงินได้) <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="dSpouse" value="0"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>บุตร (คนละ 30,000) <span class="unit">คน</span></label><input type="number" id="dChild" value="0"></div>
+            <div class="field"><label>บุตรคนที่ 2+ เกิด ≥2561 (60,000) <span class="unit">คน</span></label><input type="number" id="dChild60" value="0"></div>
+          </div>
+          <div class="field"><label>เลี้ยงดูพ่อแม่ <span class="unit">คน × 30,000</span></label><input type="number" id="dParent" value="0"></div>
+          <div class="row2">
+            <div class="field"><label>เบี้ยประกันชีวิต <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="dLife" value="0"></div>
+            <div class="field"><label>ประกันสุขภาพตนเอง <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="dHealth" value="0"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>ประกันสังคม (จ่ายจริง/ปี) <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="dSso" value="10500"></div>
+            <div class="field"><label>ดอกเบี้ยบ้าน <span class="unit">≤100,000</span></label><input type="text" inputmode="numeric" class="money" id="dHome" value="0"></div>
+          </div>
+          <div class="field"><label>ลดหย่อนอื่น ๆ <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="dOther" value="0"></div>
+          <div class="assump-note">เลี้ยงดูพ่อแม่ 30,000/คน · บุตรคนละ 30,000 (คนที่ 2+ เกิดตั้งแต่ปี 2561 เพิ่มเป็น 60,000) · เบี้ยประกันชีวิต + สุขภาพตนเอง (sub ≤25,000) รวมเพดาน 100,000 · ประกันชีวิตต้องคุ้มครอง ≥10 ปี</div>
+        </div>
+      </details>
+      <details open>
+        <summary>กลุ่มลงทุน/ประกันเพื่อเกษียณ</summary>
+        <div class="body">
+          <div class="assump-note" style="margin-top:0;margin-bottom:12px">เบี้ย RMF · ประกันบำนาญ · ประกันชีวิต ดึงจากแผนด้านบนอัตโนมัติ (แก้ที่การ์ด "เครื่องมือออมเพิ่ม")</div>
+          <div class="row2">
+            <div class="field"><label>ThaiESG + ThaiESGX เงินใหม่ <span class="unit">≤300,000</span></label><input type="text" inputmode="numeric" class="money" id="dEsg" value="0"></div>
+            <div class="field"><label>ThaiESGX โยก LTF (ปี 2-5) <span class="unit">≤50,000</span></label><input type="text" inputmode="numeric" class="money" id="dEsgxLtf" value="0"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>กอช. <span class="unit">≤30,000</span></label><input type="text" inputmode="numeric" class="money" id="dGoch" value="0"></div>
+            <div class="field"><label>PVD เงินสะสมลูกจ้าง/ปี <span class="unit">≤15% ค่าจ้าง</span></label><input type="text" inputmode="numeric" class="money" id="dPvd" value="0"></div>
+          </div>
+          <div class="assump-note">ThaiESG + ThaiESGX เงินใหม่ ใช้เพดานร่วมกัน ≤30% เงินได้ และ ≤300,000 (แยกจากกลุ่มเกษียณ) · RMF + ประกันบำนาญ + PVD + กอช. รวมกัน ≤500,000 · PVD นับเฉพาะเงินสะสมส่วนลูกจ้าง</div>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div>
+    <div class="taxsave">
+      <div class="lab">ภาษีที่ประหยัดเพิ่มขึ้นจากแผนเกษียณ</div>
+      <div class="big" id="taxSaved">–</div>
+      <div class="note" id="taxSavedNote"></div>
+    </div>
+    <div class="card">
+      <h2><span class="dot"></span>เปรียบเทียบภาษี</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="lab">ภาษีก่อนใช้แผน</div><div class="val num" id="taxBefore">–</div></div>
+        <div class="stat"><div class="lab">ภาษีหลังใช้แผน</div><div class="val num surplus" id="taxAfter">–</div></div>
+      </div>
+      <div class="bd">
+        <div class="bd-row"><span class="k">ลดหย่อน RMF</span><span class="v num" id="dedRmf">–</span></div>
+        <div class="bd-row"><span class="k">ลดหย่อนประกันบำนาญ</span><span class="v num" id="dedAnn">–</span></div>
+        <div class="bd-row"><span class="k">ลดหย่อนประกันชีวิต+สุขภาพ</span><span class="v num" id="dedLife">–</span></div>
+        <div class="bd-row"><span class="k">ลดหย่อน PVD/กอช.</span><span class="v num" id="dedPvdGoch">–</span></div>
+        <div class="bd-row"><span class="k">ลดหย่อน ThaiESG/ESGX</span><span class="v num" id="dedEsg">–</span></div>
+        <div class="bd-row"><span class="k">อัตราภาษีขั้นบันไดสูงสุด</span><span class="v num" id="marginalRate">–</span></div>
+      </div>
+      <div class="placeholder-note" id="capNote" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">วางแผนเกษียณ</div>
+<div class="section-sub">หาเงินที่ต้องเตรียม (RF) เทียบแหล่งเงินที่มี (SF) → ส่วนขาด (SH = RF − SF)</div>
 <div class="grid">
 
   <!-- INPUT -->
@@ -134,10 +217,10 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
           <button data-m="income">รายได้ (Replacement)</button>
         </div>
       </div>
-      <div id="expenseBox"><div class="field"><label>รายจ่ายปัจจุบัน <span class="unit">บาท/เดือน</span></label><input type="number" id="curExpense" value="30000"></div></div>
+      <div id="expenseBox"><div class="field"><label>รายจ่ายปัจจุบัน <span class="unit">บาท/เดือน</span></label><input type="text" inputmode="numeric" class="money" id="curExpense" value="30000"></div></div>
       <div id="incomeBox" style="display:none">
         <div class="row2">
-          <div class="field"><label>รายได้ปัจจุบัน <span class="unit">บาท/เดือน</span></label><input type="number" id="curIncome" value="50000"></div>
+          <div class="field"><label>รายได้ปัจจุบัน <span class="unit">บาท/เดือน</span></label><input type="text" inputmode="numeric" class="money" id="curIncome" value="50000"></div>
           <div class="field"><label>Replacement ratio <span class="unit">%</span></label><input type="number" id="rr" value="70"></div>
         </div>
       </div>
@@ -147,7 +230,7 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
           <div class="row3">
             <div class="field"><label>เงินเฟ้อ <span class="unit">%</span></label><input type="number" id="infl" value="3" step="0.5"></div>
             <div class="field"><label>ขึ้นเงินเดือน <span class="unit">%</span></label><input type="number" id="salGrowth" value="5" step="0.5"></div>
-            <div class="field"><label>มรดก (FV) <span class="unit">บาท</span></label><input type="number" id="bequest" value="0"></div>
+            <div class="field"><label>มรดก (FV) <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="bequest" value="0"></div>
           </div>
           <div class="row2">
             <div class="field"><label>ผลตอบแทนก่อนเกษียณ <span class="unit">%</span></label><input type="number" id="preRet" value="6" step="0.5"></div>
@@ -162,21 +245,24 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
       <h2><span class="dot"></span>แหล่งเงินเดิมที่มี (SF)</h2>
       <div class="hint">เงินก้อนงอกถึงวันเกษียณ · บำนาญคงที่คิดมูลค่า ณ วันเกษียณ</div>
       <div class="row2">
-        <div class="field"><label>เงินออม/กองทุนปัจจุบัน <span class="unit">บาท</span></label><input type="number" id="savingsLump" value="500000"></div>
-        <div class="field"><label>ยอด PVD/กบข. ปัจจุบัน <span class="unit">บาท</span></label><input type="number" id="pvdBalance" value="300000"></div>
+        <div class="field"><label>เงินออม/กองทุนปัจจุบัน <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="savingsLump" value="500000"></div>
+        <div class="field"><label>ยอด PVD/กบข. ปัจจุบัน <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="pvdBalance" value="300000"></div>
       </div>
-      <div class="field"><label>สมทบ PVD รวมต่อเดือน <span class="unit">บาท/เดือน</span></label><input type="number" id="pvdMonthly" value="6000"></div>
+      <div class="field"><label>สมทบ PVD รวมต่อเดือน <span class="unit">บาท/เดือน</span></label><input type="text" inputmode="numeric" class="money" id="pvdMonthly" value="6000"></div>
+      <div style="margin-top:4px;margin-bottom:8px"><label style="font-weight:500;font-size:14px;margin:0">ประกันสะสมทรัพย์ที่จะได้รับ <span class="unit" style="font-weight:400">เพิ่มได้หลายกรมธรรม์</span></label></div>
+      <div id="endowList"></div>
+      <button id="endowAdd" type="button" class="addbtn">+ เพิ่มกรมธรรม์</button>
       <details>
         <summary>บำนาญ และเงินชดเชย</summary>
         <div class="body">
           <div class="row2">
             <div class="field"><label>ส่งประกันสังคมแล้ว <span class="unit">เดือน</span></label><input type="number" id="ssoMonths" value="180"></div>
-            <div class="field"><label>ฐานเงินเดือน ปกส. <span class="unit">บาท/เดือน</span></label><input type="number" id="ssoBase" value="25000"></div>
+            <div class="field"><label>ฐานเงินเดือน ปกส. <span class="unit">บาท/เดือน</span></label><input type="text" inputmode="numeric" class="money" id="ssoBase" value="25000"></div>
           </div>
-          <div class="field"><label>บำนาญอื่น ๆ (ข้าราชการ ฯลฯ) <span class="unit">บาท/ปี</span></label><input type="number" id="otherPension" value="0"></div>
+          <div class="field"><label>บำนาญอื่น ๆ (ข้าราชการ ฯลฯ) <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="otherPension" value="0"></div>
           <div class="field" style="margin-top:4px"><label class="toggle"><input type="checkbox" id="sevOn"> รวมเงินชดเชยตามกฎหมายแรงงาน (เฉพาะลูกจ้าง)</label></div>
           <div class="row2" id="sevBox" style="display:none">
-            <div class="field"><label>เงินเดือนสุดท้าย <span class="unit">บาท/เดือน</span></label><input type="number" id="sevSalary" value="80000"></div>
+            <div class="field"><label>เงินเดือนสุดท้าย <span class="unit">บาท/เดือน</span></label><input type="text" inputmode="numeric" class="money" id="sevSalary" value="80000"></div>
             <div class="field"><label>อายุงาน <span class="unit">ปี</span></label><input type="number" id="sevYears" value="20"></div>
           </div>
         </div>
@@ -190,12 +276,12 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
 
       <div class="tool" id="tool-gen">
         <div class="tool-head"><input type="checkbox" id="genOn" checked> เงินออม/ลงทุนทั่วไป <span class="tag">ไม่ลดหย่อน</span></div>
-        <div class="body2"><div class="field"><label>ออมเพิ่มต่อปี <span class="unit">บาท/ปี</span></label><input type="number" id="genAnnual" value="60000"></div></div>
+        <div class="body2"><div class="field"><label>ออมเพิ่มต่อปี <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="genAnnual" value="60000"></div></div>
       </div>
 
       <div class="tool" id="tool-rmf">
         <div class="tool-head"><input type="checkbox" id="rmfOn"> RMF <span class="tag">ลดหย่อนกลุ่มเกษียณ</span></div>
-        <div class="body2"><div class="field"><label>ลงทุน RMF ต่อปี <span class="unit">บาท/ปี</span></label><input type="number" id="rmfAnnual" value="60000"></div></div>
+        <div class="body2"><div class="field"><label>ลงทุน RMF ต่อปี <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="rmfAnnual" value="60000"></div></div>
       </div>
 
       <div class="tool" id="tool-life">
@@ -205,11 +291,11 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
             <select id="lifePreset"><option value="custom">กำหนดเอง</option><option value="vantage">UOB Vantage Growth 5/18</option></select>
           </div>
           <div class="row3">
-            <div class="field"><label>เบี้ย/ปี <span class="unit">บาท</span></label><input type="number" id="lifePrem" value="100000"></div>
+            <div class="field"><label>เบี้ย/ปี <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="lifePrem" value="100000"></div>
             <div class="field"><label>จ่ายเบี้ย <span class="unit">ปี</span></label><input type="number" id="lifePay" value="5"></div>
             <div class="field"><label>คุ้มครอง <span class="unit">ปี</span></label><input type="number" id="lifeTerm" value="18"></div>
           </div>
-          <div class="field"><label>เงินรับเมื่อครบสัญญา (รวมเงินคืน) <span class="unit">บาท</span></label><input type="number" id="lifeMaturity" value="650000"></div>
+          <div class="field"><label>เงินรับเมื่อครบสัญญา (รวมเงินคืน) <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="lifeMaturity" value="650000"></div>
           <div class="placeholder-note" id="vantageNote" style="display:none">⚠️ ตัวเลขตุ๊กตา — UOB Vantage Growth 5/18 มีโครงสร้างจ่ายเบี้ย 5 ปี คุ้มครอง 18 ปี รับเงินคืนทุก 2 ปี แต่ % เงินคืน/ครบสัญญาจริงต้องใช้สเปก/ตาราง cashflow ทางการของบริษัทแทน</div>
         </div>
       </div>
@@ -221,8 +307,8 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
             <select id="annPreset"><option value="custom">กำหนดเอง</option><option value="pruprime">UOB PRUPrime Annuity 5/90</option></select>
           </div>
           <div class="row2">
-            <div class="field"><label>เบี้ย/ปี <span class="unit">บาท</span></label><input type="number" id="annPrem" value="100000"></div>
-            <div class="field"><label>ทุนประกัน <span class="unit">บาท</span></label><input type="number" id="annSum" value="700000"></div>
+            <div class="field"><label>เบี้ย/ปี <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="annPrem" value="100000"></div>
+            <div class="field"><label>ทุนประกัน <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="annSum" value="700000"></div>
           </div>
           <div class="row3">
             <div class="field"><label>บำนาญ <span class="unit">% ของทุน/ปี</span></label><input type="number" id="annPct" value="15"></div>
@@ -254,10 +340,22 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
       <div class="bd">
         <div class="bd-row"><span class="k">เงินออม/ลงทุน + เครื่องมือออม</span><span class="v num" id="bdSavings">–</span></div>
         <div class="bd-row"><span class="k">PVD/กบข.</span><span class="v num" id="bdPvd">–</span></div>
+        <div class="bd-row"><span class="k">ประกันสะสมทรัพย์ (เดิม)</span><span class="v num" id="bdEndow">–</span></div>
         <div class="bd-row"><span class="k">ประกันชีวิต (มูลค่า ณ เกษียณ)</span><span class="v num" id="bdLife">–</span></div>
         <div class="bd-row"><span class="k">ประกันบำนาญ (PV)</span><span class="v num" id="bdAnn">–</span></div>
         <div class="bd-row"><span class="k">บำนาญประกันสังคม (PV)</span><span class="v num" id="bdSso">–</span></div>
         <div class="bd-row"><span class="k">บำนาญอื่น + เงินชดเชย</span><span class="v num" id="bdOther">–</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="dot"></span>เงินใช้ต่อเดือน ณ วัยเกษียณ</h2>
+      <div class="hint" id="incomeHint">ที่มาของเงินใช้เดือนแรกหลังเกษียณ</div>
+      <div style="position:relative;height:240px"><canvas id="incomeChart"></canvas></div>
+      <div class="bd" style="margin-top:8px">
+        <div class="bd-row"><span class="k">ถอนจากเงินออม/ลงทุน</span><span class="v num" id="incDraw">–</span></div>
+        <div class="bd-row"><span class="k">บำนาญประกันสังคม</span><span class="v num" id="incSso">–</span></div>
+        <div class="bd-row"><span class="k">ประกันบำนาญ</span><span class="v num" id="incAnn">–</span></div>
+        <div class="bd-row"><span class="k">บำนาญอื่น (ข้าราชการ ฯลฯ)</span><span class="v num" id="incOther">–</span></div>
       </div>
     </div>
     <div class="card">
@@ -271,64 +369,6 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
   </div>
 </div>
 
-<!-- TAX MODULE -->
-<div class="section-title">พาร์ทภาษี — ประหยัดได้เท่าไหร่จากแผนเกษียณ</div>
-<div class="section-sub">กรอกค่าลดหย่อนของคุณ แล้วระบบจะคำนวณว่าเบี้ย RMF + ประกันบำนาญ + ประกันชีวิต จากแผนข้างบน ช่วยประหยัดภาษีเพิ่มขึ้นเท่าไหร่ (ปีภาษี 2569)</div>
-
-<div class="grid" style="padding-top:0">
-  <div>
-    <div class="card">
-      <h2><span class="dot"></span>รายได้ และค่าลดหย่อน</h2>
-      <div class="field"><label>เงินได้ทั้งปี (40(1)(2)) <span class="unit">บาท/ปี</span></label><input type="number" id="taxIncome" value="900000"></div>
-      <div class="hint" style="margin-top:-6px">หักค่าใช้จ่ายเหมา 50% สูงสุด 100,000 ให้อัตโนมัติ</div>
-      <details open>
-        <summary>ค่าลดหย่อนพื้นฐาน</summary>
-        <div class="body">
-          <div class="row2">
-            <div class="field"><label>ส่วนตัว (คงที่) <span class="unit">บาท</span></label><input type="number" id="dPersonal" value="60000" disabled></div>
-            <div class="field"><label>คู่สมรส (ไม่มีเงินได้) <span class="unit">บาท</span></label><input type="number" id="dSpouse" value="0"></div>
-          </div>
-          <div class="row2">
-            <div class="field"><label>บุตร <span class="unit">คน × 30,000</span></label><input type="number" id="dChild" value="0"></div>
-            <div class="field"><label>เลี้ยงดูพ่อแม่ <span class="unit">คน × 30,000</span></label><input type="number" id="dParent" value="0"></div>
-          </div>
-          <div class="row2">
-            <div class="field"><label>ประกันสังคม (จ่ายจริง/ปี) <span class="unit">บาท</span></label><input type="number" id="dSso" value="10500"></div>
-            <div class="field"><label>ประกันสุขภาพตนเอง <span class="unit">บาท</span></label><input type="number" id="dHealth" value="0"></div>
-          </div>
-          <div class="row2">
-            <div class="field"><label>ดอกเบี้ยบ้าน <span class="unit">≤100,000</span></label><input type="number" id="dHome" value="0"></div>
-            <div class="field"><label>โซลาร์รูฟท็อป <span class="unit">≤200,000</span></label><input type="number" id="dSolar" value="0"></div>
-          </div>
-          <div class="field"><label>ลดหย่อนอื่น ๆ <span class="unit">บาท</span></label><input type="number" id="dOther" value="0"></div>
-          <div class="assump-note">เลี้ยงดูพ่อแม่ตั้งไว้ 30,000/คน · ประกันสังคมปี 2569 เพดาน 10,500 · ประกันสุขภาพตนเองนับรวมเพดานประกันชีวิต 100,000</div>
-        </div>
-      </details>
-    </div>
-  </div>
-  <div>
-    <div class="taxsave">
-      <div class="lab">ภาษีที่ประหยัดเพิ่มขึ้นจากแผนเกษียณ</div>
-      <div class="big" id="taxSaved">–</div>
-      <div class="note" id="taxSavedNote"></div>
-    </div>
-    <div class="card">
-      <h2><span class="dot"></span>เปรียบเทียบภาษี</h2>
-      <div class="stat-grid">
-        <div class="stat"><div class="lab">ภาษีก่อนใช้แผน</div><div class="val num" id="taxBefore">–</div></div>
-        <div class="stat"><div class="lab">ภาษีหลังใช้แผน</div><div class="val num surplus" id="taxAfter">–</div></div>
-      </div>
-      <div class="bd">
-        <div class="bd-row"><span class="k">ลดหย่อน RMF</span><span class="v num" id="dedRmf">–</span></div>
-        <div class="bd-row"><span class="k">ลดหย่อนประกันบำนาญ</span><span class="v num" id="dedAnn">–</span></div>
-        <div class="bd-row"><span class="k">ลดหย่อนประกันชีวิต</span><span class="v num" id="dedLife">–</span></div>
-        <div class="bd-row"><span class="k">อัตราภาษีขั้นบันไดสูงสุด</span><span class="v num" id="marginalRate">–</span></div>
-      </div>
-      <div class="placeholder-note" id="capNote" style="display:none"></div>
-    </div>
-  </div>
-</div>
-
 <footer>
   <div class="disclaimer">เครื่องมือนี้เป็นการประมาณการตามสมมติฐานและเกณฑ์ภาษีปี 2569 (เกณฑ์เดิม) เพื่อช่วยวางแผนตามแนวทาง CFP เท่านั้น ไม่ใช่คำแนะนำการลงทุน ภาษี หรือการเงินรายบุคคล · ตัวเลขแบบประกันที่เป็น "ตุ๊กตา" ต้องแทนด้วยสเปก/ใบเสนอทางการก่อนใช้กับลูกค้าจริง</div>
 </footer>
@@ -338,8 +378,20 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
 const THB=new Intl.NumberFormat('th-TH',{maximumFractionDigits:0});
 const fmt=v=>isFinite(v)?THB.format(Math.round(v))+' บาท':'–';
 const $=id=>document.getElementById(id);
-const val=id=>parseFloat($(id).value)||0;
+const val=id=>parseFloat(String($(id).value).replace(/,/g,''))||0;
 const on=id=>$(id).checked;
+function formatMoneyInput(el){
+  const caret=el.selectionStart||el.value.length;
+  const raw=el.value;
+  const digitsBefore=(raw.slice(0,caret).match(/\d/g)||[]).length;
+  const digits=raw.replace(/[^\d]/g,'');
+  if(digits===''){el.value='';return;}
+  const formatted=parseInt(digits,10).toLocaleString('en-US');
+  el.value=formatted;
+  let pos=0,seen=0;
+  while(pos<formatted.length&&seen<digitsBefore){if(/\d/.test(formatted[pos]))seen++;pos++;}
+  try{el.setSelectionRange(pos,pos);}catch(e){}
+}
 let method='expense';
 
 function fvLump(pv,r,n){return pv*Math.pow(1+r,n);}
@@ -386,6 +438,14 @@ function model(over){
   const rm=preRet/12,mo=12*n;
   const sfPvd=val('pvdBalance')*Math.pow(1+rm,mo)+(rm===0?val('pvdMonthly')*mo:val('pvdMonthly')*((Math.pow(1+rm,mo)-1)/rm));
 
+  // existing endowment policies (multiple): grow at preRet if before retirement, else discount at postRet
+  let sfEndow=0;
+  document.querySelectorAll('.endow-row').forEach(row=>{
+    const v=parseFloat(String(row.querySelector('.endow-val').value).replace(/,/g,''))||0;
+    const a=parseFloat(row.querySelector('.endow-age').value)||0;
+    if(v>0){ if(a<=retAge) sfEndow+=v*Math.pow(1+preRet,retAge-a); else sfEndow+=v/Math.pow(1+postRet,a-retAge); }
+  });
+
   // life insurance maturity valued at retirement
   let sfLife=0;
   if(on('lifeOn')){
@@ -395,13 +455,14 @@ function model(over){
   }
 
   // annuity stream PV at retirement
-  let sfAnn=0;
+  let sfAnn=0, annYr1=0;
   if(on('annOn')){
     const pay=val('annSum')*(val('annPct')/100);
     const aStart=val('annStart'),aEnd=val('annEnd');
     for(let age=Math.max(aStart,retAge);age<=aEnd;age++){
       sfAnn+=pay/Math.pow(1+postRet,age-retAge);
     }
+    if(retAge>=aStart&&retAge<=aEnd) annYr1=pay;
   }
 
   // SSO pension PV
@@ -413,53 +474,87 @@ function model(over){
   const sfOtherPen=pvOrd(val('otherPension'),postRet,N);
   const sfSev=on('sevOn')?val('sevSalary')*(sevDays(val('sevYears'))/30):0;
 
-  const SF=sfSavings+sfPvd+sfLife+sfAnn+sfSso+sfOtherPen+sfSev;
+  const SF=sfSavings+sfPvd+sfEndow+sfLife+sfAnn+sfSso+sfOtherPen+sfSev;
   const SH=RF-SF;
   const reqMonthly=(SH>0&&n>0)?(rm===0?SH/mo:SH/((Math.pow(1+rm,mo)-1)/rm)):0;
-  return {n,N,need1,RF,SF,SH,reqMonthly,sfSavings,sfPvd,sfLife,sfAnn,sfSso,sfOther:sfOtherPen+sfSev};
+  return {n,N,need1,RF,SF,SH,reqMonthly,sfSavings,sfPvd,sfEndow,sfLife,sfAnn,sfSso,sfOther:sfOtherPen+sfSev,
+    ssoAnnual,otherPenAnnual:val('otherPension'),annYr1};
 }
 
 // TAX
 function taxModel(){
   const income=val('taxIncome');
   const expense=Math.min(income*0.5,100000);
-  const base=60000+val('dSpouse')+val('dChild')*30000+val('dParent')*30000
-    +Math.min(val('dSso'),10500)
-    +Math.min(val('dHome'),100000)+Math.min(val('dSolar'),200000)+val('dOther');
-  // life+health bucket (excluding new life-savings premium handled below)
-  const healthOwn=val('dHealth');
+  const base=60000+val('dSpouse')+val('dChild')*30000+val('dChild60')*60000+val('dParent')*30000
+    +Math.min(val('dSso'),10500)+Math.min(val('dHome'),100000)+val('dOther');
 
-  // retirement premiums from plan
+  // premiums from plan
   const rmf=on('rmfOn')?val('rmfAnnual'):0;
   const annP=on('annOn')?val('annPrem'):0;
   const lifeP=on('lifeOn')?val('lifePrem'):0;
   const lifeTerm=val('lifeTerm');
 
-  // life+health cap 100k (health + life-savings premium, only if term>=10)
-  const lifeEligible=(on('lifeOn')&&lifeTerm>=10)?lifeP:0;
-  const lifeHealthDed=Math.min(healthOwn+lifeEligible,100000);
-  const lifeDed=Math.max(0,Math.min(lifeEligible, lifeHealthDed-Math.min(healthOwn,100000)));
-  const healthDed=Math.min(healthOwn,100000);
+  // life premiums: existing (base) + from plan (needs term>=10), within 100k w/ health (health sub 25k)
+  const planLife=(on('lifeOn')&&lifeTerm>=10)?lifeP:0;
+  const baseLife=val('dLife');
+  const totalLife=planLife+baseLife;
+  const healthDed=Math.min(val('dHealth'),25000);
+  const lifeDed=Math.min(totalLife,Math.max(0,100000-healthDed));
+  const lifeHealthDed=healthDed+lifeDed;
 
-  // annuity: <=15% income, <=200k (+ unused life allowance up to 300k)
-  const annAllow=Math.min(0.15*income, 200000+Math.max(0,100000-(healthDed+lifeDed)));
+  // annuity 15%/200k (+ unused 100k -> up to 300k)
+  const annAllow=Math.min(0.15*income,200000+Math.max(0,100000-lifeHealthDed));
   let annDed=Math.min(annP,annAllow);
-  // rmf <=30% income,<=500k
   let rmfDed=Math.min(rmf,0.30*income,500000);
-  // retirement group <=500k (annuity+rmf+pvd... here annuity+rmf)
-  const grp=annDed+rmfDed;
-  if(grp>500000){const sc=500000/grp;annDed*=sc;rmfDed*=sc;}
+  let pvdDed=Math.min(val('dPvd'),0.15*income,500000);
+  let gochDed=Math.min(val('dGoch'),30000);
+  // retirement group 500k
+  let grp=annDed+rmfDed+pvdDed+gochDed;
+  if(grp>500000){const sc=500000/grp;annDed*=sc;rmfDed*=sc;pvdDed*=sc;gochDed*=sc;}
+  // ThaiESG + ESGX new money: 30%/300k, separate
+  const esgDed=Math.min(val('dEsg'),0.30*income,300000);
+  const esgxLtfDed=Math.min(val('dEsgxLtf'),50000);
 
-  const baseAll=base+healthDed; // deductions WITHOUT the 3 retirement instruments
-  const netBefore=Math.max(0,income-expense-baseAll);
-  const planDed=lifeDed+annDed+rmfDed;
-  const netAfter=Math.max(0,income-expense-baseAll-planDed);
+  const investIns=lifeDed+annDed+rmfDed+pvdDed+gochDed+esgDed+esgxLtfDed;
+  const baseDed=base+healthDed;
+  const netBefore=Math.max(0,income-expense-baseDed);
+  const netAfter=Math.max(0,income-expense-baseDed-investIns);
+  const taxBefore=incomeTax(netBefore),taxAfter=incomeTax(netAfter);
 
-  const taxBefore=incomeTax(netBefore);
-  const taxAfter=incomeTax(netAfter);
-  return {taxBefore,taxAfter,saved:taxBefore-taxAfter,rmfDed,annDed,lifeDed,
-    marginal:marginalRate(netBefore),
-    capped:(rmf>rmfDed+1)||(annP>annDed+1)||(lifeP>lifeDed+1&&lifeEligible>0)||(on('lifeOn')&&lifeTerm<10)};
+  const capped=(rmf>rmfDed+1)||(annP>annDed+1)||(totalLife>lifeDed+1)
+    ||(on('lifeOn')&&lifeTerm<10)||(val('dEsg')>esgDed+1)||(val('dPvd')>pvdDed+1)
+    ||(val('dGoch')>gochDed+1)||(val('dEsgxLtf')>esgxLtfDed+1);
+  return {taxBefore,taxAfter,saved:taxBefore-taxAfter,rmfDed,annDed,lifeDed:lifeHealthDed,
+    pvdGochDed:pvdDed+gochDed,esgDed:esgDed+esgxLtfDed,marginal:marginalRate(netBefore),capped};
+}
+
+const centerText={id:'centerText',afterDraw(c){
+  const {ctx,chartArea:{left,right,top,bottom}}=c;
+  const x=(left+right)/2,y=(top+bottom)/2;
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='#6E7B74';ctx.font='12px Sarabun';ctx.fillText('รวม/เดือน',x,y-12);
+  const total=c.data.datasets[0].data.reduce((a,b)=>a+b,0);
+  ctx.fillStyle='#13302A';ctx.font='600 20px "IBM Plex Mono"';ctx.fillText(THB.format(total),x,y+8);
+  ctx.restore();
+}};
+let incomeChart;
+function renderIncome(r){
+  const pensionM=(r.ssoAnnual+r.otherPenAnnual+r.annYr1)/12;
+  const draw=Math.max(0,r.need1/12-pensionM);
+  const sso=r.ssoAnnual/12, ann=r.annYr1/12, oth=r.otherPenAnnual/12;
+  $('incDraw').textContent=fmt(draw);
+  $('incSso').textContent=sso>0?fmt(sso):'–';
+  $('incAnn').textContent=on('annOn')&&ann>0?fmt(ann):'–';
+  $('incOther').textContent=oth>0?fmt(oth):'–';
+  $('incomeHint').textContent='เงินใช้เดือนแรกหลังเกษียณ ≈ '+fmt(r.need1/12)+'/เดือน (ณ อายุ '+val('retAge')+' ปี)';
+  const data={labels:['ถอนจากเงินออม/ลงทุน','ประกันสังคม','ประกันบำนาญ','บำนาญอื่น'],
+    datasets:[{data:[Math.round(draw),Math.round(sso),Math.round(ann),Math.round(oth)],
+      backgroundColor:['#BC5A34','#157A5B','#B0852E','#6E7B74'],borderWidth:2,borderColor:'#fff'}]};
+  const opts={responsive:true,maintainAspectRatio:false,cutout:'62%',
+    plugins:{legend:{position:'bottom',labels:{font:{family:'Sarabun',size:12},usePointStyle:true,boxWidth:8,padding:12}},
+      tooltip:{callbacks:{label:c=>c.label+': '+THB.format(c.parsed)+' บาท/เดือน'}}}};
+  if(incomeChart){incomeChart.data=data;incomeChart.update();}
+  else incomeChart=new Chart($('incomeChart'),{type:'doughnut',data,options:opts,plugins:[centerText]});
 }
 
 let chart;
@@ -475,19 +570,22 @@ function render(){
   else{shBig.textContent='เพียงพอแล้ว';shBig.className='big surplus';shNote.textContent='แหล่งเงินครอบคลุม RF (เกิน '+fmt(-r.SH)+')';
     $('reqMonthly').textContent='ไม่ต้องออมเพิ่ม';$('reqMonthly').className='val num surplus';}
   $('bdSavings').textContent=fmt(r.sfSavings);$('bdPvd').textContent=fmt(r.sfPvd);
+  $('bdEndow').textContent=r.sfEndow>0?fmt(r.sfEndow):'–';
   $('bdLife').textContent=on('lifeOn')?fmt(r.sfLife):'–';
   $('bdAnn').textContent=on('annOn')?fmt(r.sfAnn):'–';
   $('bdSso').textContent=fmt(r.sfSso);$('bdOther').textContent=fmt(r.sfOther);
+  renderIncome(r);
 
   const t=taxModel();
   $('taxBefore').textContent=fmt(t.taxBefore);
   $('taxAfter').textContent=fmt(t.taxAfter);
   $('taxSaved').textContent=fmt(t.saved);
-  $('taxSavedNote').textContent=t.saved>0?'จากเบี้ย RMF + บำนาญ + ชีวิต ที่ใช้ลดหย่อน':'ยังไม่มีเครื่องมือที่ลดหย่อนได้ในแผน';
+  $('taxSavedNote').textContent=t.saved>0?'จากกลุ่มลงทุน/ประกันเพื่อเกษียณที่ใช้ลดหย่อน':'ยังไม่มีรายการลดหย่อนกลุ่มลงทุน/ประกัน';
   $('dedRmf').textContent=fmt(t.rmfDed);$('dedAnn').textContent=fmt(t.annDed);$('dedLife').textContent=fmt(t.lifeDed);
+  $('dedPvdGoch').textContent=fmt(t.pvdGochDed);$('dedEsg').textContent=fmt(t.esgDed);
   $('marginalRate').textContent=t.marginal+'%';
   const cn=$('capNote');
-  if(t.capped){cn.style.display='block';cn.textContent='⚠️ เบี้ยบางส่วนเกินเพดานลดหย่อน (100k ชีวิต+สุขภาพ / 200k บำนาญ / 500k กลุ่มเกษียณ / 30% RMF) หรือประกันชีวิตคุ้มครอง <10 ปี จึงลดหย่อนได้ไม่เต็มเบี้ย';}
+  if(t.capped){cn.style.display='block';cn.textContent='⚠️ บางรายการเกินเพดาน (100k ชีวิต+สุขภาพ / 200k บำนาญ / 300k ThaiESG / 500k กลุ่มเกษียณ / 30% RMF / 50k ThaiESGX-LTF) หรือประกันชีวิตคุ้มครอง <10 ปี จึงลดหย่อนได้ไม่เต็มจำนวน';}
   else cn.style.display='none';
 
   renderChart();
@@ -533,6 +631,22 @@ $('sevOn').addEventListener('change',()=>{$('sevBox').style.display=on('sevOn')?
 $('flexVar').addEventListener('change',renderChart);
 document.querySelectorAll('input[type=number],select').forEach(el=>el.addEventListener('input',render));
 $('tool-gen').classList.add('on');
+document.querySelectorAll('.money').forEach(el=>{el.addEventListener('input',()=>{formatMoneyInput(el);render();});formatMoneyInput(el);});
+function addEndowRow(v,a){
+  const div=document.createElement('div');
+  div.className='endow-row';
+  div.innerHTML='<div class="field" style="flex:1;margin:0"><label>มูลค่าที่จะได้รับ <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="endow-val money" value="'+(v||0)+'"></div>'
+    +'<div class="field" style="width:120px;margin:0"><label>อายุที่ได้รับ <span class="unit">ปี</span></label><input type="number" class="endow-age" value="'+(a||60)+'"></div>'
+    +'<button type="button" class="endow-del" title="ลบกรมธรรม์นี้">×</button>';
+  document.getElementById('endowList').appendChild(div);
+  const mv=div.querySelector('.endow-val');
+  mv.addEventListener('input',()=>{formatMoneyInput(mv);render();});
+  div.querySelector('.endow-age').addEventListener('input',render);
+  formatMoneyInput(mv);
+  div.querySelector('.endow-del').addEventListener('click',()=>{div.remove();render();});
+}
+document.getElementById('endowAdd').addEventListener('click',()=>{addEndowRow();});
+addEndowRow();
 render();
 </script>
 </body>
