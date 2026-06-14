@@ -285,12 +285,18 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
 
       <div class="tool" id="tool-gen">
         <div class="tool-head"><input type="checkbox" id="genOn" checked> เงินออม/ลงทุนทั่วไป <span class="tag">ไม่ลดหย่อน</span></div>
-        <div class="body2"><div class="field"><label>ออมเพิ่มต่อปี <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="genAnnual" value="0"></div></div>
+        <div class="body2">
+          <div class="field"><label>ออมเพิ่มต่อปี <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="genAnnual" value="0"></div>
+          <label class="toggle" style="margin-top:6px"><input type="checkbox" id="genGrow"> เพิ่มขึ้นทุกปีตามเงินเดือน (<span id="genGrowRate">5</span>%/ปี)</label>
+        </div>
       </div>
 
       <div class="tool" id="tool-rmf">
         <div class="tool-head"><input type="checkbox" id="rmfOn"> RMF <span class="tag">ลดหย่อนกลุ่มเกษียณ</span></div>
-        <div class="body2"><div class="field"><label>ลงทุน RMF ต่อปี <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="rmfAnnual" value="0"></div></div>
+        <div class="body2">
+          <div class="field"><label>ลงทุน RMF ต่อปี <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="rmfAnnual" value="0"></div>
+          <label class="toggle" style="margin-top:6px"><input type="checkbox" id="rmfGrow"> เพิ่มขึ้นทุกปีตามเงินเดือน (<span id="rmfGrowRate">5</span>%/ปี)</label>
+        </div>
       </div>
 
       <div class="tool" id="tool-life">
@@ -438,14 +444,30 @@ function model(over){
   const iReal=(1+postRet)/(1+infl)-1;
   const RF=pvDue(need1,iReal,N,bequest);
 
-  // existing savings + generic + RMF (lumps grown at preRet)
+  // helper: FV annuity ปกติหรือ growing ขึ้นกับ flag
+  function fvAnnuityG(pmt1, r, salG, n, grow){
+    if(!grow||Math.abs(salG)<1e-9) return fvAnnuity(pmt1,r,n);
+    if(Math.abs(r-salG)<1e-9) return pmt1*n*Math.pow(1+r,n-1);
+    return pmt1*(Math.pow(1+r,n)-Math.pow(1+salG,n))/(r-salG);
+  }
+  const salG=val('salGrowth')/100;
+  // existing savings + generic + RMF
   let lumpAnnual=0;
-  if(on('genOn')) lumpAnnual+=val('genAnnual');
-  if(on('rmfOn')) lumpAnnual+=val('rmfAnnual');
-  const sfSavings=fvLump(val('savingsLump'),preRet,n)+fvAnnuity(lumpAnnual,preRet,n);
+  if(on('genOn')) lumpAnnual+=on('genGrow')?0:val('genAnnual');
+  if(on('rmfOn')) lumpAnnual+=on('rmfGrow')?0:val('rmfAnnual');
+  let sfSavings=fvLump(val('savingsLump'),preRet,n)+fvAnnuity(lumpAnnual,preRet,n);
+  if(on('genOn')&&on('genGrow')) sfSavings+=fvAnnuityG(val('genAnnual'),preRet,salG,n,true);
+  if(on('rmfOn')&&on('rmfGrow')) sfSavings+=fvAnnuityG(val('rmfAnnual'),preRet,salG,n,true);
 
-  const rm=preRet/12,mo=12*n;
-  const sfPvd=val('pvdBalance')*Math.pow(1+rm,mo)+(rm===0?val('pvdMonthly')*mo:val('pvdMonthly')*((Math.pow(1+rm,mo)-1)/rm));
+  const rm=preRet/12, mo=12*n;
+  // PVD: ปีแรกสมทบตามที่กรอก (คงที่ทั้งปี) · ปีถัดไป step-up ตามเงินเดือน · ทบต้นรายเดือน (END mode)
+  const s12=rm===0?12:(Math.pow(1+rm,12)-1)/rm; // FV ของ 12 งวดรายเดือน ณ สิ้นปี
+  const R=Math.pow(1+rm,12);                     // ตัวคูณทบต้นต่อปี
+  const gp=val('salGrowth')/100;                 // อัตราโตต่อปี
+  const q=(1+gp)/R;
+  const sumFactor=Math.abs(q-1)<1e-10?n:(1-Math.pow(q,n))/(1-q);
+  const pvdContrib=n<=0?0:val('pvdMonthly')*s12*Math.pow(R,n-1)*sumFactor;
+  const sfPvd=val('pvdBalance')*Math.pow(1+rm,mo)+pvdContrib;
 
   // existing endowment policies (multiple): grow at preRet if before retirement, else discount at postRet
   let sfEndow=0;
@@ -463,11 +485,11 @@ function model(over){
     else sfLife=mat/Math.pow(1+postRet,term-n);
   }
 
-  // annuity stream PV at retirement
+  // annuity stream PV at retirement (discount ถึง min(อายุจ่ายถึง, อายุขัย) ให้สอดคล้องกับ RF)
   let sfAnn=0, annYr1=0;
   if(on('annOn')){
     const pay=val('annSum')*(val('annPct')/100);
-    const aStart=val('annStart'),aEnd=val('annEnd');
+    const aStart=val('annStart'),aEnd=Math.min(val('annEnd'),lifeExp);
     for(let age=Math.max(aStart,retAge);age<=aEnd;age++){
       sfAnn+=pay/Math.pow(1+postRet,age-retAge);
     }
@@ -642,6 +664,13 @@ $('sevOn').addEventListener('change',()=>{$('sevBox').style.display=on('sevOn')?
 $('ssoContinue').addEventListener('change',render);
 ['genOn','rmfOn','lifeOn','annOn'].forEach(id=>$(id).addEventListener('change',e=>{
   $('tool-'+id.replace('On','')).classList.toggle('on',e.target.checked);render();}));
+['genGrow','rmfGrow'].forEach(id=>$(id).addEventListener('change',render));
+// อัปเดต label อัตราโตทุกครั้งที่ salGrowth เปลี่ยน
+function updateGrowLabels(){
+  const rate=val('salGrowth');
+  ['gen','rmf'].forEach(k=>{const el=$(k+'GrowRate');if(el)el.textContent=rate;});
+}
+$('salGrowth').addEventListener('input',()=>{updateGrowLabels();render();});
 $('flexVar').addEventListener('change',renderChart);
 document.querySelectorAll('input[type=number],select').forEach(el=>el.addEventListener('input',render));
 $('tool-gen').classList.add('on');
