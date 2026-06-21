@@ -364,20 +364,31 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
     </div>
     <div class="card">
       <h2><span class="dot"></span>เงินใช้ต่อเดือน ณ วัยเกษียณ</h2>
-      <div class="hint" id="incomeHint">ที่มาของเงินใช้เดือนแรกหลังเกษียณ</div>
-      <div style="position:relative;height:240px"><canvas id="incomeChart"></canvas></div>
-      <div class="bd" style="margin-top:8px">
-        <div class="bd-row"><span class="k">ถอนจากเงินออม/ลงทุน</span><span class="v num" id="incDraw">–</span></div>
-        <div class="bd-row"><span class="k">บำนาญประกันสังคม</span><span class="v num" id="incSso">–</span></div>
-        <div class="bd-row"><span class="k">ประกันบำนาญ</span><span class="v num" id="incAnn">–</span></div>
-        <div class="bd-row"><span class="k">บำนาญอื่น (ข้าราชการ ฯลฯ)</span><span class="v num" id="incOther">–</span></div>
+      <div class="hint" id="incomeHint">ณ วันเกษียณ (เดือนแรก)</div>
+      <div style="text-align:center;margin:4px 0 8px">
+        <div style="font-size:12.5px;color:var(--muted)">เงินใช้ได้ต่อเดือน ณ เกษียณ — คาดการณ์ / เป้าหมาย</div>
+        <div style="line-height:1.2;margin-top:2px">
+          <span class="num" id="incAchieve" style="font-size:26px;font-weight:700">–</span>
+          <span class="num" style="font-size:20px;color:var(--muted);font-weight:600"> / </span>
+          <span class="num" id="incTarget" style="font-size:26px;font-weight:700;color:var(--ink)">–</span>
+          <span style="font-size:14px;color:var(--muted)"> บาท</span>
+        </div>
       </div>
+      <div style="position:relative;height:230px"><canvas id="incomeChart"></canvas></div>
+      <div class="bd" style="margin-top:10px">
+        <div class="bd-row" style="font-weight:600"><span class="k" style="color:var(--primary)">กลุ่มบำนาญ (รับตายตัว)</span><span class="v num" id="incPenSub">–</span></div>
+        <div class="bd-row"><span class="k" style="padding-left:16px">ประกันสังคม</span><span class="v num" id="incSso">–</span></div>
+        <div class="bd-row"><span class="k" style="padding-left:16px">ประกันบำนาญ</span><span class="v num" id="incAnn">–</span></div>
+        <div class="bd-row"><span class="k" style="padding-left:16px">บำนาญอื่น (ข้าราชการ ฯลฯ)</span><span class="v num" id="incOther">–</span></div>
+        <div class="bd-row" style="font-weight:600"><span class="k" style="color:var(--gap)">ถอนจากเงินก้อน (บริหารเอง)</span><span class="v num" id="incDraw">–</span></div>
+      </div>
+      <div class="assump-note" style="margin-top:8px">"ถอนจากเงินก้อน" = เงินที่ถอนได้แบบยั่งยืนต่อเดือนจากเงินก้อนจริงที่มี (SF) ตลอดช่วงเกษียณ — ดูแยกย่อยว่ามาจากเงินก้อนไหนได้ที่การ์ด "สรุปการคำนวณเกษียณ" ด้านบน · ถ้า "คาดการณ์" ต่ำกว่า "เป้าหมาย" แปลว่ายังต้องเตรียมเพิ่ม</div>
     </div>
     <div class="card">
-      <h2><span class="dot"></span>ถ้าผลตอบแทนเปลี่ยน?</h2>
-      <div class="hint">ผลตอบแทนต่ำลงเพียงเล็กน้อยทำให้ต้องออมเพิ่มขึ้นมาก</div>
-      <div class="chart-tools"><div class="field"><label>ปรับผลตอบแทน</label>
-        <select id="flexVar"><option value="pre">ก่อนเกษียณ</option><option value="post">หลังเกษียณ</option><option value="both">ทั้งสองพร้อมกัน</option></select>
+      <h2><span class="dot"></span>เงินใช้ได้ต่อเดือน ตามผลตอบแทน</h2>
+      <div class="hint" id="sensHint">เทียบเงินที่ใช้ได้ต่อเดือน (เดือนแรกหลังเกษียณ) ระหว่างผลตอบแทนเดิม กับที่ปรับ</div>
+      <div class="chart-tools"><div class="field"><label>ปรับผลตอบแทนก่อนเกษียณเป็น</label>
+        <select id="flexRate"></select>
       </div></div>
       <div class="chart-box"><canvas id="sensChart"></canvas></div>
     </div>
@@ -509,8 +520,9 @@ function model(over){
 
   const SF=sfSavings+sfPvd+sfEndow+sfLife+sfAnn+sfSso+sfOtherPen+sfSev;
   const SH=RF-SF;
+  const lumpSF=sfSavings+sfPvd+sfEndow+sfLife+sfSev; // เงินก้อนจริง (ไม่รวม PV บำนาญ)
   const reqMonthly=(SH>0&&n>0)?(rm===0?SH/mo:SH/((Math.pow(1+rm,mo)-1)/rm)):0;
-  return {n,N,need1,RF,SF,SH,reqMonthly,sfSavings,sfPvd,sfEndow,sfLife,sfAnn,sfSso,sfOther:sfOtherPen+sfSev,
+  return {n,N,need1,RF,SF,SH,reqMonthly,lumpSF,sfSavings,sfPvd,sfEndow,sfLife,sfAnn,sfSso,sfOther:sfOtherPen+sfSev,
     ssoAnnual,ssoBase:base,otherPenAnnual:val('otherPension'),annYr1};
 }
 
@@ -561,34 +573,87 @@ function taxModel(){
     pvdGochDed:pvdDed+gochDed,esgDed:esgDed+esgxLtfDed,marginal:marginalRate(netBefore),capped};
 }
 
+let incomePensionPct=0, incomeCenterColor='#157A5B';
 const centerText={id:'centerText',afterDraw(c){
   const {ctx,chartArea:{left,right,top,bottom}}=c;
   const x=(left+right)/2,y=(top+bottom)/2;
   ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle='#6E7B74';ctx.font='12px Sarabun';ctx.fillText('รวม/เดือน',x,y-12);
-  const total=c.data.datasets[0].data.reduce((a,b)=>a+b,0);
-  ctx.fillStyle='#13302A';ctx.font='600 20px "IBM Plex Mono"';ctx.fillText(THB.format(total),x,y+8);
+  ctx.fillStyle='#6E7B74';ctx.font='12px Sarabun';ctx.fillText('ครอบคลุมเป้าหมาย',x,y-18);
+  ctx.fillStyle=incomeCenterColor;ctx.font='600 32px "IBM Plex Mono"';ctx.fillText(Math.round(incomePensionPct)+'%',x,y+6);
+  ctx.fillStyle='#6E7B74';ctx.font='11px Sarabun';ctx.fillText('ของเงินที่ต้องใช้',x,y+30);
   ctx.restore();
 }};
 let incomeChart;
 function renderIncome(r){
+  const target=r.need1/12;
   const pensionM=(r.ssoAnnual+r.otherPenAnnual+r.annYr1)/12;
-  const draw=Math.max(0,r.need1/12-pensionM);
   const sso=r.ssoAnnual/12, ann=r.annYr1/12, oth=r.otherPenAnnual/12;
-  $('incDraw').textContent=fmt(draw);
+  // ถอนจากเงินก้อน = เงินก้อนจริง (lumpSF) ถอนแบบยั่งยืนตลอด N ปี
+  const infl=val('infl')/100, postRet=val('postRet')/100;
+  const iReal=(1+postRet)/(1+infl)-1;
+  let factor=1;
+  if(r.N>0) factor=Math.abs(iReal)<1e-9?r.N:((1-Math.pow(1+iReal,-r.N))/iReal)*(1+iReal);
+  const drawM=r.N>0?r.lumpSF/factor/12:0;
+  const achievable=pensionM+drawM;
+  const coverage=target>0?achievable/target*100:0;
+  const pct=v=>achievable>0?Math.round(v/achievable*100):0;
+  incomePensionPct=coverage;
+  incomeCenterColor=coverage>=100?'#157A5B':'#BC5A34';
+  $('incAchieve').textContent=THB.format(Math.round(achievable));
+  $('incAchieve').style.color=achievable>=target?'var(--primary)':'var(--gap)';
+  $('incTarget').textContent=THB.format(Math.round(target));
+  $('incomeHint').textContent='ณ อายุ '+val('retAge')+' ปี (เดือนแรกหลังเกษียณ)';
+  $('incPenSub').textContent=fmt(pensionM)+' · '+pct(pensionM)+'%';
   $('incSso').textContent=sso>0?fmt(sso):'–';
   $('incAnn').textContent=on('annOn')&&ann>0?fmt(ann):'–';
   $('incOther').textContent=oth>0?fmt(oth):'–';
-  $('incomeHint').textContent='เงินใช้เดือนแรกหลังเกษียณ ≈ '+fmt(r.need1/12)+'/เดือน (ณ อายุ '+val('retAge')+' ปี)';
-  const data={labels:['ถอนจากเงินออม/ลงทุน','ประกันสังคม','ประกันบำนาญ','บำนาญอื่น'],
-    datasets:[{data:[Math.round(draw),Math.round(sso),Math.round(ann),Math.round(oth)],
-      backgroundColor:['#BC5A34','#157A5B','#B0852E','#6E7B74'],borderWidth:2,borderColor:'#fff'}]};
-  const opts={responsive:true,maintainAspectRatio:false,cutout:'62%',
-    plugins:{legend:{position:'bottom',labels:{font:{family:'Sarabun',size:12},usePointStyle:true,boxWidth:8,padding:12}},
-      tooltip:{callbacks:{label:c=>c.label+': '+THB.format(c.parsed)+' บาท/เดือน'}}}};
+  $('incDraw').textContent=fmt(drawM)+' · '+pct(drawM)+'%';
+  const data={labels:['ถอนจากเงินก้อน','กลุ่มบำนาญ'],
+    datasets:[{data:[Math.round(drawM),Math.round(pensionM)],
+      backgroundColor:['#BC5A34','#157A5B'],borderWidth:2,borderColor:'#fff'}]};
+  const opts={responsive:true,maintainAspectRatio:false,cutout:'70%',
+    plugins:{legend:{position:'bottom',labels:{font:{family:'Sarabun',size:12},usePointStyle:true,boxWidth:8,padding:14}},
+      tooltip:{callbacks:{label:c=>c.label+': '+THB.format(c.parsed)+' บาท/เดือน ('+pct(c.parsed)+'%)'}}}};
   if(incomeChart){incomeChart.data=data;incomeChart.update();}
   else incomeChart=new Chart($('incomeChart'),{type:'doughnut',data,options:opts,plugins:[centerText]});
 }
+
+// เงินที่ใช้ได้ต่อเดือน = บำนาญจริง(ปีแรก) + ถอนจากเงินก้อน(lumpSF)แบบยั่งยืนตลอด N ปี
+function monthlyUsable(preRetPct){
+  const m=model({pre:preRetPct});
+  if(m.N<=0) return 0;
+  const infl=val('infl')/100, postRet=val('postRet')/100;
+  const iReal=(1+postRet)/(1+infl)-1;
+  let factor;
+  if(Math.abs(iReal)<1e-9) factor=m.N; else factor=((1-Math.pow(1+iReal,-m.N))/iReal)*(1+iReal);
+  const pensionM=(m.ssoAnnual+m.otherPenAnnual+m.annYr1)/12;
+  return pensionM+m.lumpSF/factor/12;
+}
+function populateFlexRate(){
+  const base=Math.round(val('preRet'));
+  const sel=$('flexRate'); const prev=sel.value;
+  sel.innerHTML='';
+  for(let r=base-3;r<=base+3;r++){
+    if(r<1) continue;
+    const o=document.createElement('option');
+    o.value=r; o.textContent=r+'%'+(r===base?' (เดิม)':'');
+    sel.appendChild(o);
+  }
+  const opts=[...sel.options].map(o=>o.value);
+  sel.value=opts.includes(prev)?prev:String(base);
+}
+let sensTarget=0;
+const targetLine={id:'targetLine',afterDraw(c){
+  if(!sensTarget) return;
+  const y=c.scales.y.getPixelForValue(sensTarget);
+  const {left,right}=c.chartArea, ctx=c.ctx;
+  if(y<c.chartArea.top||y>c.chartArea.bottom) return;
+  ctx.save();ctx.strokeStyle='#13302A';ctx.setLineDash([5,4]);ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();
+  ctx.setLineDash([]);ctx.fillStyle='#13302A';ctx.font='10px Sarabun';ctx.textAlign='right';
+  ctx.fillText('เป้าหมาย '+THB.format(sensTarget),right-4,y-5);
+  ctx.restore();
+}};
 
 let chart;
 function render(){
@@ -626,22 +691,25 @@ function render(){
   renderChart();
 }
 function renderChart(){
-  const flex=$('flexVar').value,labels=[],reqData=[],shData=[];
-  for(let p=3;p<=8.0001;p+=0.5){
-    const o=flex==='pre'?{pre:p}:flex==='post'?{post:p}:{pre:p,post:p};
-    const m=model(o);labels.push(p.toFixed(1)+'%');
-    reqData.push(Math.max(0,Math.round(m.reqMonthly)));shData.push(Math.round(m.SH));
-  }
-  const data={labels,datasets:[
-    {label:'ออม/เดือน',data:reqData,borderColor:'#BC5A34',backgroundColor:'rgba(188,90,52,.08)',yAxisID:'y',tension:.3,fill:true,pointRadius:3},
-    {label:'ส่วนขาด SH',data:shData,borderColor:'#157A5B',yAxisID:'y1',tension:.3,pointRadius:2,borderDash:[5,4]}]};
-  const opts={responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{labels:{font:{family:'Sarabun',size:12},usePointStyle:true,boxWidth:8}},
-      tooltip:{callbacks:{label:c=>c.dataset.label+': '+THB.format(c.parsed.y)}}},
-    scales:{x:{title:{display:true,text:'ผลตอบแทนสมมติ',font:{family:'Sarabun',size:11}},ticks:{font:{family:'IBM Plex Mono',size:10}}},
-      y:{position:'left',ticks:{font:{family:'IBM Plex Mono',size:10},callback:v=>THB.format(v)}},
-      y1:{position:'right',grid:{drawOnChartArea:false},ticks:{font:{family:'IBM Plex Mono',size:10},callback:v=>(v/1e6).toFixed(1)+'M'}}}};
-  if(chart){chart.data=data;chart.update();}else chart=new Chart($('sensChart'),{type:'line',data,options:opts});
+  const base=Math.round(val('preRet'));
+  const sel=parseFloat($('flexRate').value)||base;
+  const baseVal=Math.round(monthlyUsable(base));
+  const selVal=Math.round(monthlyUsable(sel));
+  const target=model().need1/12;
+  sensTarget=Math.round(target);
+  $('sensHint').textContent='เป้าหมายต้องใช้ ≈ '+fmt(target)+'/เดือน · แท่งคือเงินที่ทำได้จริงตามผลตอบแทน';
+  const maxV=Math.max(baseVal,selVal,target)*1.18;
+  const data={labels:['ผลตอบแทนเดิม ('+base+'%)','ปรับเป็น ('+sel+'%)'],
+    datasets:[{label:'เงินใช้ได้/เดือน',data:[baseVal,selVal],
+      backgroundColor:[ '#157A5B', sel<base?'#BC5A34':(sel>base?'#2E7D5B':'#157A5B') ],
+      borderRadius:6,maxBarThickness:96}]};
+  const opts={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>THB.format(c.parsed.y)+' บาท/เดือน'}}},
+    scales:{y:{beginAtZero:true,suggestedMax:maxV,ticks:{font:{family:'IBM Plex Mono',size:11},callback:v=>THB.format(v)}},
+      x:{ticks:{font:{family:'Sarabun',size:12.5}}}}};
+  if(chart){chart.data=data;chart.options=opts;chart.update();}
+  else chart=new Chart($('sensChart'),{type:'bar',data,options:opts,plugins:[targetLine]});
 }
 
 // presets
@@ -671,7 +739,8 @@ function updateGrowLabels(){
   ['gen','rmf'].forEach(k=>{const el=$(k+'GrowRate');if(el)el.textContent=rate;});
 }
 $('salGrowth').addEventListener('input',()=>{updateGrowLabels();render();});
-$('flexVar').addEventListener('change',renderChart);
+$('flexRate').addEventListener('change',renderChart);
+$('preRet').addEventListener('input',()=>{populateFlexRate();renderChart();});
 document.querySelectorAll('input[type=number],select').forEach(el=>el.addEventListener('input',render));
 $('tool-gen').classList.add('on');
 document.querySelectorAll('.money').forEach(el=>{el.addEventListener('input',()=>{formatMoneyInput(el);render();});formatMoneyInput(el);});
@@ -690,6 +759,7 @@ function addEndowRow(v,a){
 }
 document.getElementById('endowAdd').addEventListener('click',()=>{addEndowRow();});
 addEndowRow();
+populateFlexRate();
 render();
 </script>
 </body>
