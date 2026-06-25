@@ -268,7 +268,7 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
             </div>
           </div>
           <label class="toggle" style="margin-bottom:12px"><input type="checkbox" id="ssoContinue" checked> ส่ง ปกส. ต่อเนื่องจนถึงเกษียณ (ระบบบวกเดือนให้ สูงสุดถึงอายุ 60)</label>
-          <div class="field"><label>บำนาญอื่น ๆ (ข้าราชการ ฯลฯ) <span class="unit">บาท/ปี</span></label><input type="text" inputmode="numeric" class="money" id="otherPension" value="0"></div>
+
           <div class="field" style="margin-top:4px"><label class="toggle"><input type="checkbox" id="sevOn"> รวมเงินชดเชยตามกฎหมายแรงงาน (เฉพาะลูกจ้าง)</label></div>
           <div class="row2" id="sevBox" style="display:none">
             <div class="field"><label>เงินเดือนสุดท้าย <span class="unit">บาท/เดือน</span></label><input type="text" inputmode="numeric" class="money" id="sevSalary" value="0"></div>
@@ -302,25 +302,20 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
       <div class="tool" id="tool-life">
         <div class="tool-head"><input type="checkbox" id="lifeOn"> ประกันชีวิต/สะสมทรัพย์ <span class="tag">ลดหย่อนกลุ่มชีวิต</span></div>
         <div class="body2">
-          <div class="field"><label>แบบสำเร็จรูป</label>
-            <select id="lifePreset"><option value="custom">กำหนดเอง</option><option value="vantage">Vantage Growth 5/18</option></select>
-          </div>
+          <div class="field"><label>ชื่อแบบประกัน <span class="unit">(ไม่บังคับ)</span></label><input type="text" id="lifePreset" placeholder="เช่น สะสมทรัพย์ 15/20" style="font-size:14px"></div>
           <div class="row3">
             <div class="field"><label>เบี้ย/ปี <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="lifePrem" value="0"></div>
             <div class="field"><label>จ่ายเบี้ย <span class="unit">ปี</span></label><input type="number" id="lifePay" value="5"></div>
             <div class="field"><label>คุ้มครอง <span class="unit">ปี</span></label><input type="number" id="lifeTerm" value="18"></div>
           </div>
           <div class="field"><label>เงินรับเมื่อครบสัญญา (รวมเงินคืน) <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="lifeMaturity" value="0"></div>
-          <div class="placeholder-note" id="vantageNote" style="display:none">⚠️ ตัวเลขตุ๊กตา — Vantage Growth 5/18 มีโครงสร้างจ่ายเบี้ย 5 ปี คุ้มครอง 18 ปี รับเงินคืนทุก 2 ปี แต่ % เงินคืน/ครบสัญญาจริงต้องใช้สเปก/ตาราง cashflow ทางการของบริษัทแทน</div>
         </div>
       </div>
 
       <div class="tool" id="tool-ann">
         <div class="tool-head"><input type="checkbox" id="annOn"> ประกันบำนาญ <span class="tag">ลดหย่อนกลุ่มบำนาญ</span></div>
         <div class="body2">
-          <div class="field"><label>แบบสำเร็จรูป</label>
-            <select id="annPreset"><option value="custom">กำหนดเอง</option><option value="pruprime">PRUPrime Annuity 5/90</option></select>
-          </div>
+          <div class="field"><label>ชื่อแบบประกัน <span class="unit">(ไม่บังคับ)</span></label><input type="text" id="annPreset" placeholder="เช่น บำนาญ 5/90" style="font-size:14px"></div>
           <div class="row2">
             <div class="field"><label>เบี้ย/ปี <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="annPrem" value="0"></div>
             <div class="field"><label>ทุนประกัน <span class="unit">บาท</span></label><input type="text" inputmode="numeric" class="money" id="annSum" value="0"></div>
@@ -330,7 +325,6 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
             <div class="field"><label>เริ่มจ่ายอายุ <span class="unit">ปี</span></label><input type="number" id="annStart" value="60"></div>
             <div class="field"><label>จ่ายถึงอายุ <span class="unit">ปี</span></label><input type="number" id="annEnd" value="90"></div>
           </div>
-          <div class="placeholder-note" id="pruNote" style="display:none">ℹ️ PRUPrime Annuity 5/90: บำนาญรับรอง 15% ของทุนประกัน/ปี อายุ 60–90 (ชำระเบี้ย 5 ปี) — ทุนประกัน/เบี้ยจริงขึ้นกับใบเสนอ ปรับให้ตรงได้</div>
         </div>
       </div>
     </div>
@@ -379,7 +373,6 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
         <div class="bd-row" style="font-weight:600"><span class="k" style="color:var(--primary)">กลุ่มบำนาญ (รับตายตัว)</span><span class="v num" id="incPenSub">–</span></div>
         <div class="bd-row"><span class="k" style="padding-left:16px">ประกันสังคม</span><span class="v num" id="incSso">–</span></div>
         <div class="bd-row"><span class="k" style="padding-left:16px">ประกันบำนาญ</span><span class="v num" id="incAnn">–</span></div>
-        <div class="bd-row"><span class="k" style="padding-left:16px">บำนาญอื่น (ข้าราชการ ฯลฯ)</span><span class="v num" id="incOther">–</span></div>
         <div class="bd-row" style="font-weight:600"><span class="k" style="color:var(--gap)">ถอนจากเงินก้อน (บริหารเอง)</span><span class="v num" id="incDraw">–</span></div>
       </div>
       <div id="breakevenBox" style="margin-top:10px;padding:11px 14px;border-radius:10px;background:var(--soft);border:1px solid #CBE3D5;display:none">
@@ -412,6 +405,14 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
 
 <footer>
   <div class="disclaimer">เครื่องมือนี้เป็นการประมาณการตามสมมติฐานและเกณฑ์ภาษีปี 2569 (เกณฑ์เดิม) เพื่อช่วยวางแผนตามแนวทาง CFP เท่านั้น ไม่ใช่คำแนะนำการลงทุน ภาษี หรือการเงินรายบุคคล · ตัวเลขแบบประกันที่เป็น "ตุ๊กตา" ต้องแทนด้วยสเปก/ใบเสนอทางการก่อนใช้กับลูกค้าจริง</div>
+  <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="font-size:11px;color:#6E7B74">
+      © 2569 Pidtapong.k · เผยแพร่ภายใต้
+      <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" style="color:#157A5B;text-decoration:underline">CC BY-NC 4.0</a>
+      · ใช้ได้ฟรีเพื่อการศึกษาและส่วนตัว · <strong>ห้ามใช้เชิงพาณิชย์</strong>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;background:#EEF4F0;color:#157A5B;padding:3px 10px;border-radius:999px;border:1px solid #CBE3D5">v1.0</div>
+  </div>
 </footer>
 </div>
 
@@ -531,15 +532,14 @@ function model(over){
   let ssoAnnual=0;
   if(ssoFilled&&ssoMonths>=180){const rate=0.20+0.015*Math.floor((ssoMonths-180)/12);ssoAnnual=rate*base*12;}
   const sfSso=pvOrd(ssoAnnual,postRet,N);
-  const sfOtherPen=pvOrd(val('otherPension'),postRet,N);
   const sfSev=on('sevOn')?val('sevSalary')*(sevDays(val('sevYears'))/30):0;
 
-  const SF=sfSavings+sfPvd+sfEndow+sfLife+sfAnn+sfSso+sfOtherPen+sfSev;
+  const SF=sfSavings+sfPvd+sfEndow+sfLife+sfAnn+sfSso+sfSev;
   const SH=RF-SF;
-  const lumpSF=sfSavings+sfPvd+sfEndow+sfLife+sfSev; // เงินก้อนจริง (ไม่รวม PV บำนาญ)
+  const lumpSF=sfSavings+sfPvd+sfEndow+sfLife+sfSev;
   const reqMonthly=(SH>0&&n>0)?(rm===0?SH/mo:SH/((Math.pow(1+rm,mo)-1)/rm)):0;
-  return {n,N,need1,RF,SF,SH,reqMonthly,lumpSF,sfSavings,sfPvd,sfEndow,sfLife,sfAnn,sfSso,sfOther:sfOtherPen+sfSev,
-    ssoAnnual,ssoBase:base,otherPenAnnual:val('otherPension'),annYr1};
+  return {n,N,need1,RF,SF,SH,reqMonthly,lumpSF,sfSavings,sfPvd,sfEndow,sfLife,sfAnn,sfSso,sfOther:sfSev,
+    ssoAnnual,ssoBase:base,otherPenAnnual:0,annYr1};
 }
 
 // TAX
@@ -603,7 +603,7 @@ let incomeChart;
 function renderIncome(r){
   const target=r.need1/12;
   const pensionM=(r.ssoAnnual+r.otherPenAnnual+r.annYr1)/12;
-  const sso=r.ssoAnnual/12, ann=r.annYr1/12, oth=r.otherPenAnnual/12;
+  const sso=r.ssoAnnual/12, ann=r.annYr1/12;
   // ถอนจากเงินก้อน = เงินก้อนจริง (lumpSF) ถอนแบบยั่งยืนตลอด N ปี
   const infl=val('infl')/100, postRet=val('postRet')/100;
   const iReal=(1+postRet)/(1+infl)-1;
@@ -622,7 +622,6 @@ function renderIncome(r){
   $('incPenSub').textContent=fmt(pensionM)+' · '+pct(pensionM)+'%';
   $('incSso').textContent=sso>0?fmt(sso):'–';
   $('incAnn').textContent=on('annOn')&&ann>0?fmt(ann):'–';
-  $('incOther').textContent=oth>0?fmt(oth):'–';
   $('incDraw').textContent=fmt(drawM)+' · '+pct(drawM)+'%';
   const data={labels:['ถอนจากเงินก้อน','กลุ่มบำนาญ'],
     datasets:[{data:[Math.round(drawM),Math.round(pensionM)],
@@ -772,16 +771,6 @@ function renderChart(){
 }
 
 // presets
-$('lifePreset').addEventListener('change',e=>{
-  const v=e.target.value;$('vantageNote').style.display=v==='vantage'?'block':'none';
-  if(v==='vantage'){$('lifePay').value=5;$('lifeTerm').value=18;$('lifePrem').value=100000;$('lifeMaturity').value=650000;}
-  render();
-});
-$('annPreset').addEventListener('change',e=>{
-  const v=e.target.value;$('pruNote').style.display=v==='pruprime'?'block':'none';
-  if(v==='pruprime'){$('annPct').value=15;$('annStart').value=60;$('annEnd').value=90;$('annPrem').value=100000;$('annSum').value=700000;}
-  render();
-});
 
 $('methodSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;method=b.dataset.m;
   [...$('methodSeg').children].forEach(x=>x.classList.toggle('on',x===b));
@@ -900,7 +889,7 @@ td.grp{font-weight:700;color:#00266B;background:#F4F7FB}
   <div class="rpt-logo"><span style="font-size:11px;letter-spacing:.04em">วางแผนการเงิน</span></div>
   <div class="rpt-title">
     <h1>รายงานวางแผนภาษีและเกษียณ</h1>
-    <p>จัดทำ ณ วันที่ ${today} · เป็นประมาณการเพื่อการวางแผน ไม่ใช่การรับประกันผลตอบแทน</p>
+    <p>จัดทำ ณ วันที่ ${today} · เป็นประมาณการเพื่อการวางแผน ไม่ใช่การรับประกันผลตอบแทน · v1.0 © 2569 Pidtapong.k</p>
   </div>
 </div>
 
@@ -980,7 +969,7 @@ td.grp{font-weight:700;color:#00266B;background:#F4F7FB}
       ${on('lifeOn')?`<tr><td>ประกันชีวิต (มูลค่า)</td><td class="val">${fmtN(r.sfLife)}</td></tr>`:''}
       ${r.sfAnn>0?`<tr><td>ประกันบำนาญ (PV)</td><td class="val">${fmtN(r.sfAnn)}</td></tr>`:''}
       ${r.sfSso>0?`<tr><td>บำนาญประกันสังคม (PV)</td><td class="val">${fmtN(r.sfSso)}</td></tr>`:''}
-      ${r.sfOther>0?`<tr><td>บำนาญอื่น + เงินชดเชย (PV)</td><td class="val">${fmtN(r.sfOther)}</td></tr>`:''}
+      ${r.sfOther>0?`<tr><td>เงินชดเชย (PV)</td><td class="val">${fmtN(r.sfOther)}</td></tr>`:''}
       <tr style="background:#EEF3FC"><td><b>รวม SF</b></td><td class="val"><b>${fmtN(r.SF)}</b></td></tr>
     </table>
   </div>
@@ -1001,7 +990,6 @@ td.grp{font-weight:700;color:#00266B;background:#F4F7FB}
       <tr><td class="grp">กลุ่มบำนาญ (รับตายตัว)</td><td class="val grp">${fmtN(pensionM)}</td></tr>
       ${r.ssoAnnual>0?`<tr><td class="sub">บำนาญประกันสังคม</td><td class="val">${fmtN(r.ssoAnnual/12)}</td></tr>`:''}
       ${r.annYr1>0?`<tr><td class="sub">ประกันบำนาญ</td><td class="val">${fmtN(r.annYr1/12)}</td></tr>`:''}
-      ${r.otherPenAnnual>0?`<tr><td class="sub">บำนาญอื่น</td><td class="val">${fmtN(r.otherPenAnnual/12)}</td></tr>`:''}
       <tr><td class="grp">ถอนจากเงินก้อน (บริหารเอง)</td><td class="val grp">${fmtN(drawM)}</td></tr>
     </table>
   </div>
