@@ -376,14 +376,14 @@ footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:13px; co
         <div class="bd-row" style="font-weight:600"><span class="k" style="color:var(--gap)">ถอนจากเงินก้อน (บริหารเอง)</span><span class="v num" id="incDraw">–</span></div>
       </div>
       <div id="breakevenBox" style="margin-top:10px;padding:11px 14px;border-radius:10px;background:var(--soft);border:1px solid #CBE3D5;display:none">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:3px">ประมาณการ — เงินก้อนจะอยู่ได้ถึงอายุ</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:3px">ถ้าถอนตามเป้าหมายจริง — เงินก้อนจะอยู่ได้ถึงอายุ</div>
         <div style="display:flex;align-items:baseline;gap:8px">
           <span class="num" id="breakevenAge" style="font-size:22px;font-weight:700;color:var(--primary)">–</span>
           <span style="font-size:13px;color:var(--muted)">ปี</span>
           <span id="breakevenNote" style="font-size:12px;margin-left:4px"></span>
         </div>
       </div>
-      <div class="assump-note" style="margin-top:8px">"ถอนจากเงินก้อน" = เงินที่ถอนได้แบบยั่งยืนต่อเดือนจากเงินก้อนจริงที่มี (SF) ตลอดช่วงเกษียณ — ดูแยกย่อยว่ามาจากเงินก้อนไหนได้ที่การ์ด "สรุปการคำนวณเกษียณ" ด้านบน · ถ้า "คาดการณ์" ต่ำกว่า "เป้าหมาย" แปลว่ายังต้องเตรียมเพิ่ม</div>
+      <div class="assump-note" style="margin-top:8px">"ถอนจากเงินก้อน" = เงินที่ถอนได้แบบยั่งยืนต่อเดือนจากเงินก้อนจริงที่มี (SF) ตลอดช่วงเกษียณ — ดูแยกย่อยว่ามาจากเงินก้อนไหนได้ที่การ์ด "สรุปการคำนวณเกษียณ" ด้านบน · ถ้า "คาดการณ์" ต่ำกว่า "เป้าหมาย" แปลว่ายังต้องเตรียมเพิ่ม<br><br>"เงินก้อนจะอยู่ได้ถึงอายุ" = จำลองการถอนจริงตาม<b>เป้าหมาย</b>ที่โตตามเงินเฟ้อทุกปี โดยบำนาญ (ปกส./ประกันบำนาญ) จ่ายคงที่ไม่โต จึงต้องถอนจากเงินก้อนเพิ่มขึ้นเรื่อยๆ เพื่อชดเชย → เลขนี้บอกว่าเงินก้อนจริงจะหมดเมื่ออายุเท่าไหร่</div>
     </div>
     <div class="card">
       <h2><span class="dot"></span>เงินใช้ได้ต่อเดือน ตามผลตอบแทน</h2>
@@ -633,38 +633,38 @@ function renderIncome(r){
   else incomeChart=new Chart($('incomeChart'),{type:'doughnut',data,options:opts,plugins:[centerText]});
 
   // breakeven age: หาว่าเงินก้อน (lumpSF) จะหมดตอนอายุเท่าไหร่
-  // ใช้ iReal เหมือนกับ factor เพื่อให้สอดคล้องกัน
-  // annuity-due: lumpSF = W × [(1−(1+iReal)^-T)/iReal] × (1+iReal)
-  // → (1+iReal)^-T = 1 − lumpSF×iReal / (W×(1+iReal))
-  // → T = −ln(1 − ...) / ln(1+iReal)
+  // breakeven age (สมจริง): ถอนตาม "เป้าหมาย" ที่โตตามเงินเฟ้อทุกปี
+  // และเนื่องจากบำนาญ (ปกส.+ประกันบำนาญ) จ่ายคงที่ ไม่โตตามเงินเฟ้อ
+  // → ต้องถอนจากเงินก้อนเพิ่มขึ้นทุกปีเพื่อชดเชยส่วนที่บำนาญ "หด"
+  // จำลองปีต่อปี: ถอนต้นปี (annuity-due) แล้วเงินที่เหลืองอกที่ postRet
   const box=$('breakevenBox');
-  const withdrawM=drawM; // ถอนต่อเดือน (= lumpSF/factor/12)
-  if(r.lumpSF>0 && withdrawM>0 && r.N>0){
+  if(r.lumpSF>0 && r.N>0){
     box.style.display='block';
-    let breakevenYears;
-    const iRealAnn=iReal; // ใช้รายปีเหมือน factor
-    if(Math.abs(iRealAnn)<1e-9){
-      // ถ้า real rate = 0: หมดใน lumpSF/(withdrawM×12) ปี
-      breakevenYears=r.lumpSF/(withdrawM*12);
-    } else {
-      const num=r.lumpSF*iRealAnn/(withdrawM*12*(1+iRealAnn));
-      if(num>=1) breakevenYears=999; // ไม่มีวันหมด
-      else breakevenYears=-Math.log(1-num)/Math.log(1+iRealAnn);
+    const targetAnnual=target*12;      // เงินที่ต้องใช้ปีแรก (รายปี)
+    const pensionAnnual=pensionM*12;    // บำนาญคงที่ (รายปี, ไม่โต)
+    let balance=r.lumpSF, breakevenYears=999;
+    for(let t=0;t<130;t++){
+      const need=targetAnnual*Math.pow(1+infl,t);   // เป้าหมายโตตามเงินเฟ้อ
+      const withdraw=Math.max(0,need-pensionAnnual);// ถอนจากเงินก้อน = ส่วนที่บำนาญคงที่ครอบไม่ถึง
+      if(withdraw<=0){ // บำนาญครอบคลุมทั้งหมด เงินก้อนไม่ต้องถูกถอน (+ยังโตอีก)
+        balance*=(1+postRet); continue;
+      }
+      if(balance<withdraw){ // ปีนี้เงินก้อนไม่พอถอนเต็ม → หมดกลางปี
+        breakevenYears=t+balance/withdraw; break;
+      }
+      balance=(balance-withdraw)*(1+postRet); // ถอนต้นปีแล้วงอกทั้งปี
+      if(balance<=0){ breakevenYears=t+1; break; }
     }
-    const breakevenAge=Math.round(val('retAge')+breakevenYears);
+    const breakevenAge=Math.floor(val('retAge')+breakevenYears);
     const lifeExpV=val('lifeExp');
-    $('breakevenAge').textContent=breakevenAge>120?'ไม่หมด':String(breakevenAge);
-    if(breakevenAge>120){
+    $('breakevenAge').textContent=breakevenYears>=129?'ไม่หมด':String(breakevenAge);
+    if(breakevenYears>=129){
       $('breakevenAge').style.color='var(--primary)';
-      $('breakevenNote').textContent='';
-      $('breakevenNote').style.color='';
-    } else if(breakevenAge>lifeExpV){
-      $('breakevenAge').style.color='var(--primary)';
-      $('breakevenNote').textContent='✓ นานกว่าอายุคาดหวัง ('+lifeExpV+' ปี)';
+      $('breakevenNote').textContent='✓ บำนาญครอบคลุมพอ เงินก้อนไม่ต้องถูกถอน';
       $('breakevenNote').style.color='var(--primary)';
-    } else if(breakevenAge===lifeExpV){
+    } else if(breakevenAge>=lifeExpV){
       $('breakevenAge').style.color='var(--primary)';
-      $('breakevenNote').textContent='✓ พอดีกับอายุคาดหวัง ('+lifeExpV+' ปี)';
+      $('breakevenNote').textContent='✓ พอถึง/เกินอายุคาดหวัง ('+lifeExpV+' ปี)';
       $('breakevenNote').style.color='var(--primary)';
     } else {
       $('breakevenAge').style.color='var(--gap)';
